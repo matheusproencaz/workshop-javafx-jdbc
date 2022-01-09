@@ -30,7 +30,7 @@ public class Main extends Application {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	} 
 	
 	public static Scene getMainScene() {
 		return mainScene;
