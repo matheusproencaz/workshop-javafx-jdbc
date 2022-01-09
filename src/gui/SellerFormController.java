@@ -1,9 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -132,6 +134,25 @@ public class SellerFormController implements Initializable {
 		}
 		obj.setName(txtName.getText());
 
+		if (txtEmail.getText() == null || txtEmail.getText().trim().equals("")) {
+			exception.addError("email", "Field can't be empty");
+		}
+		obj.setEmail(txtEmail.getText());
+
+		if (dpBirthDate.getValue() == null) {
+			exception.addError("birthDate", "Field can't be empty");
+		} else {
+			Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setBirthDate(Date.from(instant));
+		}
+
+		if (txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().equals("")) {
+			exception.addError("baseSalary", "Field can't be empty");
+		}
+		obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
+
+		obj.setDepartment(comboBoxDepartment.getValue());
+		
 		if (exception.getErros().size() > 0) {
 			throw exception;
 		}
@@ -174,13 +195,13 @@ public class SellerFormController implements Initializable {
 		if (entity.getBirthDate() != null) {
 			dpBirthDate.setValue(LocalDate.ofInstant(entity.getBirthDate().toInstant(), ZoneId.systemDefault()));
 		}
-		
-		if(entity.getDepartment() == null) {
+
+		if (entity.getDepartment() == null) {
 			comboBoxDepartment.getSelectionModel().selectFirst();
 		}
 		comboBoxDepartment.setValue(entity.getDepartment());
 	}
-	
+
 	public void loadAssociatedObjects() {
 
 		if (departmentService == null) {
@@ -206,8 +227,12 @@ public class SellerFormController implements Initializable {
 	private void setErrorMessagens(Map<String, String> erros) {
 		Set<String> fields = erros.keySet();
 
-		if (fields.contains("name")) {
-			LabelErroName.setText(erros.get("name"));
-		}
+		LabelErroName.setText((fields.contains("name") ? erros.get("name") : ""));
+		
+		LabelErroEmail.setText((fields.contains("email") ? erros.get("email") : ""));
+		
+		LabelErroBirthDate.setText((fields.contains("birthDate") ? erros.get("birthDate") : ""));
+		
+		LabelErroBaseSalary.setText((fields.contains("baseSalary") ? erros.get("baseSalary") : ""));
 	}
 }
